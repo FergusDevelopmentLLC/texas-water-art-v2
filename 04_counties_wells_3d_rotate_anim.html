@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texas County Wells Map</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .map-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            margin-right: 5px;
+        }
+        #resetButton {
+            left: 80px; /* Adjust as needed to place it next to the Rotate button */
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<button id="rotateButton" class="map-button">Rotate</button>
+<button id="resetButton" class="map-button">Reset</button>
+<script>
+    mapboxgl.accessToken = '';
+    if(mapboxgl.accessToken == '') {
+        alert('You need a valid access token to see the map. Get one at https://www.mapbox.com/');
+    }
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [-99.9018, 30.5],
+        zoom: 5.75,
+        pitch: 25,
+        bearing: 0
+    });
+
+    map.on('load', function () {
+        fetch('./data/counties_wells.geojson')
+        .then(response => response.json())
+        .then(data => {
+            // Initialize animation progress property
+            data.features = data.features.map(feature => {
+                feature.properties.animationProgress = 0;  // Start all at 0
+                return feature;
+            });
+
+            map.addSource('texas-counties', {
+                type: 'geojson',
+                data: data
+            });
+
+            map.addLayer({
+                'id': 'county-wells',
+                'type': 'fill-extrusion',
+                'source': 'texas-counties',
+                'layout': {},
+                'paint': {
+                    'fill-extrusion-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'wells_count'],
+                        18, '#bdecb6',
+                        1000, '#89d689',
+                        5000, '#62c162',
+                        10000, '#39ad39',
+                        20000, '#208020',
+                        36226, '#106310'
+                    ],
+                    'fill-extrusion-height': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'animationProgress'],
+                        0, 0,
+                        1, ['*', ['get', 'wells_count'], 10] // Scale height by wells_count
+                    ],
+                    'fill-extrusion-base': 0,
+                    'fill-extrusion-opacity': 1
+                }
+            });
+
+            // Easing function for smooth animation
+            function easeInOutQuad(t) {
+                return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+            }
+
+            // Animate the heights
+            let animationStartTime = Date.now();
+            const animationDuration = 5000; // Total duration of 2000ms (2 seconds)
+
+            function updateHeight() {
+                let currentTime = Date.now();
+                let elapsedTime = currentTime - animationStartTime;
+                let progress = elapsedTime / animationDuration;
+
+                if (progress > 1) progress = 1; // Clamp the progress to 1
+
+                let easedProgress = easeInOutQuad(progress);
+
+                let updatedData = map.getSource('texas-counties')._data;
+                updatedData.features = updatedData.features.map(feature => {
+                    feature.properties.animationProgress = easedProgress;
+                    return feature;
+                });
+
+                map.getSource('texas-counties').setData(updatedData);
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateHeight);
+                }
+            }
+
+            requestAnimationFrame(updateHeight);
+        });
+
+        document.getElementById('rotateButton').addEventListener('click', function() {
+            map.rotateTo((map.getBearing() + 30) % 360, {
+                duration: 1000
+            });
+        });
+
+        document.getElementById('resetButton').addEventListener('click', function() {
+            map.rotateTo(0, {
+                duration: 1000
+            });
+        });
+    });
+</script>
+
+
+
+</body>
+</html>

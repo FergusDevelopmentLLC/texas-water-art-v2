@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texas County Wells Map</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    mapboxgl.accessToken = '';
+    if(mapboxgl.accessToken == '') {
+      alert('You need a valid access token to see the map. Get one at https://www.mapbox.com/');
+    }
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [-99.9018, 31.5],
+        zoom: 5.65,
+    });
+
+    map.on('load', function () {
+        // Load GeoJSON data from a local file
+        fetch('./data/counties_wells.geojson')
+        .then(response => response.json())
+        .then(data => {
+            map.addSource('texas-counties', {
+                type: 'geojson',
+                data: data
+            });
+
+            map.addLayer({
+                'id': 'county-wells',
+                'type': 'fill',
+                'source': 'texas-counties',
+                'layout': {},
+                'paint': {
+                    'fill-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'wells_count'],
+                        18, '#bdecb6',  // Light green
+                        1000, '#89d689',  // Soft green
+                        5000, '#62c162',  // Medium green
+                        10000, '#39ad39',  // Regular green
+                        20000, '#208020',  // Dark green
+                        36226, '#106310'   // Very dark green
+                        // Adjust these ranges and colors based on actual data
+                    ],
+                    'fill-opacity': 0.75
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
