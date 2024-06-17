@@ -2,7 +2,13 @@
 
 <img src="images/texas_magnify.png" style="width:500px;">
 
-This map shows the source water well data in Texas. There are 622,445 well points. Data Source: Wally Darling
+This map shows the source water well data in Texas. A water well is a structure created by drilling, digging, or boring 
+into the ground to access groundwater from aquifers. Wells are typically used to extract water for drinking, irrigation, 
+industrial use, or other purposes. They can vary in depth, diameter, and construction methods depending on the local geology 
+and intended use. Wells are essential in areas where surface water sources are scarce or unavailable, providing a reliable 
+supply of water. There are 622,445 well points. 
+
+Data Source: Wallace Darling, LRE Water
 
 ### Water Well Density Hexbin Maps
 
