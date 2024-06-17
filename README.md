@@ -1,6 +1,6 @@
 ### Texas Water Well Well Density
 
-<img src="images/texas_magnify.png" style="width:500px;">
+<img src="images/texas_magnify.png" style="width:800px;">
 
 This map shows the source water well data in Texas. A water well is a structure created by drilling, digging, or boring 
 into the ground to access groundwater from aquifers. Wells are typically used to extract water for drinking, irrigation, 
