@@ -8,8 +8,8 @@ industrial use, or other purposes. They can vary in depth, diameter, and constru
 and intended use. Wells are essential in areas where surface water sources are scarce or unavailable, providing a reliable 
 supply of water. 
 
-There were 622,445 well points in this dataset. With such dense dataset, choroplething as well as hexbinning can give a 
-better view into the density of the underlying well datapoints.
+There were 622,445 well points in this dataset. Because the point data for the wells was so dense, I uses choropleth mapping
+as well as hexbinning, in order to give a better view into the density of the underlying well datapoints.
 
 Data Source: Wallace Darling, LRE Water
 
