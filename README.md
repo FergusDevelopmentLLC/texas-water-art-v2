@@ -14,7 +14,7 @@ Data Source: Wallace Darling, LRE Water
 
 ### Water Well Density Hexbin Maps
 
-The following web maps give a sense of the density of the Water Wells in Texas using the map hexbinning.
+The following web maps give a sense of the density of the wells in Texas using chloropeth maps and the hexbinning technique.
 
 [Texas Water Well Density By County Flat Cloropleth Map](https://fergusdevelopmentllc.github.io/texas-water-art-v2/01.html)
 <div style="display: flex; gap: 10px;">
