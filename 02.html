@@ -107,6 +107,18 @@
             rangeElement.innerHTML = `<span class="legend-color" style="background: ${item[1]}"></span>${item[0]} ${index < breaks.length - 1 ? ' - ' + breaks[index + 1][0] : '+'}`;
             legend.appendChild(rangeElement);
         });
+
+        const attribution = document.createElement('div');
+        attribution.style.fontSize = 'small';
+        attribution.innerHTML = `
+            <p>
+                A water well is a structure created by drilling, digging, or boring into the ground to access groundwater from aquifers.
+            </p>
+            <p>
+                Well data source: <a href="https://www.linkedin.com/in/wallace-darling-git-93a303176" target='_blank'>Wallace Darling, GIT</a>, Hydrogeologist LRE Water<br/>
+            </p>
+        `;
+        legend.appendChild(attribution);
     }
 
     map.on('load', function () {
