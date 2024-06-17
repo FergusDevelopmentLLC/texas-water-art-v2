@@ -1,6 +1,6 @@
 ### Texas Water Well Well Density
 
-<img src="images/texas_water_wells.png" style="width:500px;">
+<img src="images/texas_magnify.png" style="width:500px;">
 
 This map shows the source water well data in Texas. There are 622,445 well points. Data Source: Wally Darling
 
