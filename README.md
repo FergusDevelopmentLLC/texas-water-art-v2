@@ -8,13 +8,14 @@ industrial use, or other purposes. They can vary in depth, diameter, and constru
 and intended use. Wells are essential in areas where surface water sources are scarce or unavailable, providing a reliable 
 supply of water. 
 
-There were 622,445 well points in this dataset.
+There were 622,445 well points in this dataset. With such dense dataset, choroplething as well as hexbinning can give a 
+better view into the density of the underlying well datapoints.
 
 Data Source: Wallace Darling, LRE Water
 
 ### Water Well Density Hexbin Maps
 
-The following web maps give a sense of the density of the wells in Texas using chloropeth maps and the hexbinning technique.
+The following web maps give a sense of the density of the wells in Texas using choropleth maps and the hexbinning technique.
 
 [Texas Water Well Density By County Flat Cloropleth Map](https://fergusdevelopmentllc.github.io/texas-water-art-v2/01.html)
 <div style="display: flex; gap: 10px;">
