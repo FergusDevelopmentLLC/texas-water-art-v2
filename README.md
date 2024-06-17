@@ -1,4 +1,4 @@
-### Texas Water Well Well Density
+### Diving into Texas Water Well Well Density
 
 <img src="images/texas_magnify.png" style="width:800px;">
 
