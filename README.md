@@ -1,11 +1,7 @@
 # texas-water-art
-4/19/2024
-
-Map Experiments
-
-1. [01_counties_wells.html](http://127.0.0.1:5500/01_counties_wells.html)
-    - Basic choropleth
-    - ![Basic choropleth](images/01.png)
+Texas Water Well Well Density Maps
+1. Choropleth
+    - 
 2. [02_counties_wells_3d.html](http://127.0.0.1:5500/02_counties_wells_3d.html)
     - Made the counties extrude (3d based on number of water wells in the county)
     - ![Made the counties extrude](images/02.png)
