@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texas Wells Map (4.5 mile hexbin)</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #legend {
+            position: absolute;
+            right: 3%;
+            bottom: 3%;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-family: Arial, sans-serif;
+        }
+        .legend-color {
+            display: inline-block;
+            height: 15px;
+            width: 15px;
+            margin-right: 5px;
+        }
+        #legend h4 {
+            margin: 0 0 10px 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<div id="legend">
+    <h4>Texas Water Wells by 4.5 mile hexbin</h4>
+</div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1Ijoid2lsbGNhcnRlciIsImEiOiJjbHhoc29lZHUxZTFrMmtvZ3A5a294YmRzIn0.Ku7Nk7ydXtJkB0PikcBppw';
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [-99.9018, 30.5],
+        zoom: 5.8,
+        pitch: 25,
+        bearing: 0
+    });
+
+    const breaksColorsArray = {
+        blue: [
+            [1.00, '#d4e6ff'],
+            [53.00, '#80bfff'],
+            [177.00, '#4da6ff'],
+            [456.00, '#1a8cff'],
+            [1551.00, '#0066cc'],
+            [3399.00, '#004c99']
+        ],
+        green: [
+            [1.00, '#e0f7e0'],
+            [53.00, '#89d689'],
+            [177.00, '#62c162'],
+            [456.00, '#39ad39'],
+            [1551.00, '#208020'],
+            [3399.00, '#106310']
+        ],
+        orange: [
+            [1.00, '#ffe0cc'],
+            [53.00, '#ffbf80'],
+            [177.00, '#ffa64d'],
+            [456.00, '#ff8c1a'],
+            [1551.00, '#cc7000'],
+            [3399.00, '#994c00']
+        ]
+    };
+
+    function updateMapAndLegend(colorScheme) {
+        const breaks = breaksColorsArray[colorScheme];
+        const colorExpression = ['interpolate', ['linear'], ['get', 'wells_count']];
+        breaks.forEach(item => {
+            colorExpression.push(item[0], item[1]);
+        });
+
+        map.addLayer({
+            'id': 'hex-wells',
+            'type': 'fill-extrusion',
+            'source': 'texas-hexes',
+            'layout': {},
+            'paint': {
+                'fill-extrusion-color': colorExpression,
+                'fill-extrusion-height': [
+                    'interpolate',
+                    ['linear'],
+                    ['get', 'wells_count'],
+                    1.00, 500,
+                    3399.00, 400000
+                ],
+                'fill-extrusion-base': 0,
+                'fill-extrusion-opacity': 1
+            }
+        });
+
+        const legend = document.getElementById('legend');
+        legend.innerHTML = '<h4>Texas Water Wells by 4.5 mile hexbin</h4>'; // Reset the legend
+        breaks.forEach((item, index) => {
+            const rangeElement = document.createElement('div');
+            rangeElement.innerHTML = `<span class="legend-color" style="background: ${item[1]}"></span>${item[0]} ${index < breaks.length - 1 ? ' - ' + breaks[index + 1][0] : '+'}`;
+            legend.appendChild(rangeElement);
+        });
+    }
+
+    map.on('load', function () {
+        fetch('./data/hex_06_wells.geojson')
+        .then(response => response.json())
+        .then(data => {
+            map.addSource('texas-hexes', {
+                type: 'geojson',
+                data: data
+            });
+            const urlParams = new URLSearchParams(window.location.search);
+            const colorScheme = urlParams.get('color') || 'blue'; // Default color scheme is blue
+            updateMapAndLegend(colorScheme);
+        });
+    });
+
+    map.on('click', 'hex-wells', function (e) {
+        var coordinates = e.lngLat;
+        var description = `Water Well Count: ${e.features[0].properties.wells_count}<br/>Hex: ${e.features[0].properties.h3_id}`;
+
+        new mapboxgl.Popup()
+            .setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map);
+    });
+
+    map.on('mouseenter', 'hex-wells', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', 'hex-wells', function () {
+        map.getCanvas().style.cursor = '';
+    });
+</script>
+</body>
+</html>
