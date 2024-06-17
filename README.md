@@ -6,7 +6,9 @@ This map shows the source water well data in Texas. A water well is a structure 
 into the ground to access groundwater from aquifers. Wells are typically used to extract water for drinking, irrigation, 
 industrial use, or other purposes. They can vary in depth, diameter, and construction methods depending on the local geology 
 and intended use. Wells are essential in areas where surface water sources are scarce or unavailable, providing a reliable 
-supply of water. There are 622,445 well points. 
+supply of water. 
+
+There were 622,445 well points in this dataset.
 
 Data Source: Wallace Darling, LRE Water
 
