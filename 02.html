@@ -34,7 +34,7 @@
 <body>
 <div id="map"></div>
 <div id="legend">
-    <h4>Texas Water Wells by County</h4>
+    <h4>Texas Water Well Density by County</h4>
 </div>
 <script>
     mapboxgl.accessToken = 'pk.eyJ1Ijoid2lsbGNhcnRlciIsImEiOiJjbHhoc29lZHUxZTFrMmtvZ3A5a294YmRzIn0.Ku7Nk7ydXtJkB0PikcBppw';
@@ -101,7 +101,7 @@
         });
 
         const legend = document.getElementById('legend');
-        legend.innerHTML = '<h4>Texas Water Wells by County</h4>'; // Reset the legend
+        legend.innerHTML = '<h4>Texas Water Well Density by County</h4>'; // Reset the legend
         breaks.forEach((item, index) => {
             const rangeElement = document.createElement('div');
             rangeElement.innerHTML = `<span class="legend-color" style="background: ${item[1]}"></span>${item[0]} ${index < breaks.length - 1 ? ' - ' + breaks[index + 1][0] : '+'}`;
