@@ -1,21 +1,18 @@
-### Diving into Texas Water Well Well Density
+### Texas Water Well Density Maps
 
 <img src="images/texas_magnify.png" style="width:800px;">
 
-This map shows the source water well data in Texas. A water well is a structure created by drilling, digging, or boring 
-into the ground to access groundwater from aquifers. Wells are typically used to extract water for drinking, irrigation, 
-industrial use, or other purposes. They can vary in depth, diameter, and construction methods depending on the local geology 
-and intended use. Wells are essential in areas where surface water sources are scarce or unavailable, providing a reliable 
-supply of water. 
+A water well is a structure created by drilling, digging, or boring into the ground to access groundwater from aquifers. Wells 
+are typically used to extract water for drinking, irrigation, industrial use, or other purposes. They can vary in depth, 
+diameter, and construction methods depending on the local geology and intended use. Wells are essential in areas where surface 
+water sources are scarce or unavailable, providing a reliable supply of water. There are 622,445 water well points in Texas.
 
-There were 622,445 well points in this dataset. Because the point data for the wells was so dense, I uses choropleth mapping
-as well as hexbinning, in order to give a better view into the density of the underlying well datapoints.
+Because if the dense point data, I used choropleth mapping as well as hexbinning to make the following web maps to 
+give better insight into the density of the underlying well datapoints.
 
-Data Source: Wallace Darling, LRE Water
-
-### Water Well Density Hexbin Maps
-
-The following web maps give a sense of the density of the wells in Texas using choropleth maps and the hexbinning technique.
+- Well data source: [Wallace Darling](https://www.linkedin.com/in/wallace-darling-git-93a303176), Hydrogeologist at [LRE Water](https://www.linkedin.com/company/lre-water)
+- Map: [Will Carter](https://www.linkedin.com/in/williamlcarter/), Software Engineer at [LRE Water](https://www.linkedin.com/company/lre-water)
+- Grid: Uber's [h3.js](https://github.com/uber/h3) geospatial indexing system
 
 [Texas Water Well Density By County Flat Cloropleth Map](https://fergusdevelopmentllc.github.io/texas-water-art-v2/01.html)
 <div style="display: flex; gap: 10px;">
