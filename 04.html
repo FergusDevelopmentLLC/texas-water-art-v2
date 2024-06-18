@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Texas Water Well Density Level 6</title>
+    <title>Texas Water Well Density</title>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
     <style>
@@ -29,6 +29,27 @@
             margin: 0 0 10px 0;
             padding: 0;
         }
+        .map-button {
+            position: absolute;
+            right: 10px;
+            padding: 10px;
+            background: white;
+            border: 1px solid grey; /* Add a grey border */
+            border-radius: 10px; /* Make the corners more round */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            cursor: pointer;
+            margin-top: 5px; /* Reduce margin to make vertical gap smaller */
+        }
+        #zoomInButton { top: 10px; }
+        #zoomOutButton { top: 55px; }
+        #rotateRightButton { top: 100px; }
+        #rotateLeftButton { top: 145px; }
+        #pitchUpButton { top: 190px; }
+        #pitchDownButton { top: 235px; }
+        #resetButton { top: 280px; }
+        .legend-range {
+            margin-bottom: 5px; /* Example style, customize as needed */
+        }
     </style>
 </head>
 <body>
@@ -36,15 +57,62 @@
 <div id="legend">
     <h4>Texas Water Well Density</h4>
 </div>
+<button id="zoomInButton" class="map-button">Zoom In</button>
+<button id="zoomOutButton" class="map-button">Zoom Out</button>
+<button id="rotateRightButton" class="map-button">Rotate Right</button>
+<button id="rotateLeftButton" class="map-button">Rotate Left</button>
+<button id="pitchUpButton" class="map-button">Pitch Up</button>
+<button id="pitchDownButton" class="map-button">Pitch Down</button>
+<button id="resetButton" class="map-button">Reset Map</button>
 <script>
     mapboxgl.accessToken = 'pk.eyJ1Ijoid2lsbGNhcnRlciIsImEiOiJjbHhoc29lZHUxZTFrMmtvZ3A5a294YmRzIn0.Ku7Nk7ydXtJkB0PikcBppw';
+    const initialAttributes = {
+        center: [-97.5, 30.5],
+        zoom: 5.9,
+        pitch: 35,
+        bearing: -10
+    };
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
-        center: [-99.9018, 30.5],
-        zoom: 5.5,
-        pitch: 25,
-        bearing: 0
+        center: initialAttributes.center,
+        zoom: initialAttributes.zoom,
+        pitch: initialAttributes.pitch,
+        bearing: initialAttributes.bearing
+    });
+
+    document.getElementById('zoomInButton').addEventListener('click', () => {
+        map.zoomTo(map.getZoom() + 0.2, { duration: 1000 }); // Zoom in a small bit
+    });
+
+    document.getElementById('zoomOutButton').addEventListener('click', () => {
+        map.zoomTo(map.getZoom() - 0.2, { duration: 1000 }); // Zoom out a small bit
+    });
+
+    document.getElementById('rotateRightButton').addEventListener('click', () => {
+        map.rotateTo(map.getBearing() - 5, { duration: 1000 }); // Rotate the map clockwise by 5 degrees
+    });
+
+    document.getElementById('rotateLeftButton').addEventListener('click', () => {
+        map.rotateTo(map.getBearing() + 5, { duration: 1000 }); // Rotate the map counterclockwise by 5 degrees
+    });
+
+    document.getElementById('pitchUpButton').addEventListener('click', () => {
+        map.setPitch(map.getPitch() - 5);
+    });
+
+    document.getElementById('pitchDownButton').addEventListener('click', () => {
+        map.setPitch(map.getPitch() + 5);
+    });
+
+    document.getElementById('resetButton').addEventListener('click', () => {
+        map.flyTo({
+            center: initialAttributes.center,
+            zoom: initialAttributes.zoom,
+            pitch: initialAttributes.pitch,
+            bearing: initialAttributes.bearing,
+            duration: 1000
+        });
     });
 
     const breaksColorsArray = {
@@ -104,6 +172,7 @@
         legend.innerHTML = '<h4>Texas Water Well Density</h4>'; // Reset the legend
         breaks.forEach((item, index) => {
             const rangeElement = document.createElement('div');
+            rangeElement.className = 'legend-range'; // Add the legend-range class
             rangeElement.innerHTML = `<span class="legend-color" style="background: ${item[1]}"></span>${item[0]} ${index < breaks.length - 1 ? ' - ' + breaks[index + 1][0] : '+'}`;
             legend.appendChild(rangeElement);
         });
@@ -113,13 +182,17 @@
         attribution.innerHTML = `
             <p>
                 A water well is a structure created by drilling, digging, or<br/>
-                boring into the ground to access groundwater from aquifers.<br/>
-                The hexgon grid size used in this map is:<br/>
-                <strong>level 6 (approx 4.5 miles in diameter)</strong>.
+                boring into the ground to access groundwater from aquifers.
             </p>
             <p>
-                Well data source: <a href="https://www.linkedin.com/in/wallace-darling-git-93a303176" target='_blank'>Wallace Darling, GIT</a>, Hydrogeologist LRE Water<br/>
-                Hexagon grid created using Uber's <a href="https://github.com/uber/h3" target="_blank">h3.js</a>
+                <strong>There are 622,445 total water wells in Texas<br/>
+                Each hexagon is approximately 4.5 miles in diameter<br/>
+                Click on a hexagon to see the well count</strong>
+            </p>
+            <p>
+                Well data source: <a href="https://www.linkedin.com/in/wallace-darling-git-93a303176" target='_blank'>Wallace Darling</a>, Hydrogeologist at <a href='https://www.linkedin.com/company/lre-water' target='_blank'>LRE Water</a><br/>
+                Map: <a href='https://www.linkedin.com/in/williamlcarter/' target='_blank'>Will Carter</a>, Software Engineer at <a href='https://www.linkedin.com/company/lre-water' target='_blank'>LRE Water</a><br/>
+                Grid: Uber's <a href="https://github.com/uber/h3" target="_blank">h3</a> geospatial indexing system
             </p>
         `;
         legend.appendChild(attribution);
