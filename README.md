@@ -41,3 +41,5 @@ give better insight into the density of the underlying well datapoints.
     <a href="https://fergusdevelopmentllc.github.io/texas-water-art-v2/04.html?color=green" target='_blank'><img src="images/04_3d_county_green.png" style="width:250px;"></a>
     <a href="https://fergusdevelopmentllc.github.io/texas-water-art-v2/04.html?color=orange" target='_blank'><img src="images/04_3d_county_orange.png" style="width:250px;"></a>
 </div>
+
+Upvote, comment, share on Reddit: https://www.reddit.com/r/MapPorn/comments/1dix9g9/texas_water_well_density/
