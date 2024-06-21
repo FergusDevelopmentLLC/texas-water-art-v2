@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataVis Test for Wally</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 60px); /* Adjust the height minus header and footer */
+        }
+        .sidebar {
+            width: 20%;
+            background-color: #f1f1f1;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .main-content {
+            width: 80%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: flex-start;
+        }
+        .chart {
+            width: 30%;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .link {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+            margin-bottom: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>DataVis Test for Wally</h1>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Locations</h2>
+            <span class="link" onclick="loadData('location1')">Location 1</span>
+            <span class="link" onclick="loadData('location2')">Location 2</span>
+            <span class="link" onclick="loadData('location3')">Location 3</span>
+        </div>
+        <div class="main-content">
+            <div id="chart1" class="chart">
+                <h2>Chart 1</h2>
+                <!-- Horizontal bar charts will go here -->
+            </div>
+            <div id="chart2" class="chart">
+                <h2>Chart 2</h2>
+                <!-- Horizontal bar charts will go here -->
+            </div>
+            <div id="chart3" class="chart">
+                <h2>Chart 3</h2>
+                <!-- Horizontal bar charts will go here -->
+            </div>
+            <div id="chart4" class="chart">
+                <h2>Vertical Bar Chart</h2>
+                <!-- Vertical bar chart will go here -->
+            </div>
+            <div id="chart5" class="chart">
+                <h2>Pie Chart</h2>
+                <!-- Pie chart will go here -->
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Your Name. All rights reserved.</p>
+    </footer>
+    <script src="visualization.js"></script>
+</body>
+</html>
