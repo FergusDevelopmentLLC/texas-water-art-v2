@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Water Districts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .legend {
+            background-color: white;
+            border-radius: 3px;
+            bottom: 30px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
+            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            padding: 10px;
+            position: absolute;
+            right: 10px;
+            z-index: 1;
+            width: 300px;
+            height: 300px;
+            overflow-y: scroll;
+        }
+        .legend h4 {
+            margin: 0 0 10px;
+        }
+        .legend .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend .legend-key {
+            border-radius: 50%;
+            display: inline-block;
+            height: 10px;
+            margin-right: 10px;
+            width: 10px;
+        }
+        .legend .legend-value {
+            flex: 1;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<div class="legend" id="legend">
+    <h4>Water Districts</h4>
+</div>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1Ijoid2lsbGNhcnRlciIsImEiOiJjbHhoc29lZHUxZTFrMmtvZ3A5a294YmRzIn0.Ku7Nk7ydXtJkB0PikcBppw';
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10', // Use the light style
+        center: [-104.9, 39.7],
+        zoom: 9.7
+    });
+
+    let geojsonData;
+
+    map.on('load', () => {
+        // Load GeoJSON file
+        fetch('/data/water_districts_all.geojson')
+            .then(response => response.json())
+            .then(data => {
+                geojsonData = data;
+                const updatedData = updateColor(geojsonData);
+                map.addSource('water_districts_all', {
+                    'type': 'geojson',
+                    'data': updatedData
+                });
+
+                // Add layer to the map
+                map.addLayer({
+                    'id': 'water_districts_all',
+                    'type': 'fill',
+                    'source': 'water_districts_all',
+                    'paint': {
+                        'fill-color': ['get', 'color'],
+                        'fill-opacity': 0.4
+                    }
+                });
+
+                // Create the legend
+                createLegend();
+            })
+            .catch(error => console.error('Error loading water_districts_all:', error));
+    });
+
+    // Define a color map for different names
+    const colors = [
+        "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF", "#800000",
+        "#808000", "#008000", "#800080", "#008080", "#000080", "#FFC0CB", "#FFA500",
+        "#A52A2A", "#8A2BE2", "#5F9EA0", "#7FFF00", "#D2691E", "#FF7F50", "#6495ED",
+        "#FFF8DC", "#DC143C", "#00FFFF", "#00008B", "#008B8B", "#B8860B", "#A9A9A9",
+        "#006400", "#BDB76B", "#8B008B", "#556B2F", "#FF8C00", "#9932CC", "#8B0000",
+        "#E9967A", "#8FBC8F", "#483D8B", "#2F4F4F", "#00CED1", "#9400D3", "#FF1493",
+        "#00BFFF", "#696969", "#1E90FF", "#B22222", "#FFFAF0", "#228B22", "#FF00FF",
+        "#DCDCDC", "#FFD700", "#DAA520", "#808080", "#ADFF2F", "#F0FFF0", "#FF69B4",
+        "#CD5C5C", "#4B0082", "#FFFFF0", "#F0E68C", "#E6E6FA", "#FFF0F5", "#7CFC00",
+        "#FFFACD", "#ADD8E6", "#F08080", "#E0FFFF", "#FAFAD2", "#D3D3D3", "#90EE90",
+        "#FFB6C1", "#FFA07A", "#20B2AA", "#87CEFA", "#778899", "#B0C4DE", "#FFFFE0",
+        "#00FF00", "#32CD32", "#FAF0E6", "#FF00FF", "#800000", "#66CDAA", "#0000CD",
+        "#BA55D3", "#9370DB", "#3CB371", "#7B68EE", "#00FA9A", "#48D1CC", "#C71585",
+        "#191970", "#F5FFFA", "#FFE4E1", "#FFE4B5", "#FFDEAD", "#000080", "#FDF5E6",
+        "#808000", "#6B8E23", "#FFA500", "#FF4500", "#DA70D6", "#EEE8AA", "#98FB98",
+        "#AFEEEE", "#DB7093", "#FFEFD5", "#FFDAB9", "#CD853F", "#FFC0CB", "#DDA0DD",
+        "#B0E0E6", "#800080", "#663399", "#FF0000", "#BC8F8F", "#4169E1", "#8B4513",
+        "#FA8072", "#FAA460", "#2E8B57", "#FFF5EE", "#A0522D", "#C0C0C0", "#87CEEB",
+        "#6A5ACD", "#708090", "#FFFAFA", "#00FF7F", "#4682B4", "#D2B48C", "#008080",
+        "#D8BFD8", "#FF6347", "#40E0D0", "#EE82EE", "#F5DEB3", "#FFFFFF", "#F5F5F5",
+        "#FFFF00", "#9ACD32"
+    ];
+
+    const names = [
+        "Academy W&S", "Airport Vista Metro 1", "Airport Vista Metro 2", "Alameda W&S", "Allenspark W&S", 
+        "Alpensee Water District", "Arapahoe County W&S", "Arapahoe County Water and Wastewater Authority", 
+        "Arapahoe Estates Water", "Avondale W&S", "BEULAH WATER WORKS DISTRICT", "BMR Metropolitan aka Bell Mtn Metro", 
+        "BOONE TOWN WATER", "Baca Grande W&S", "Bailey W&S", "Bancroft-Clover W&S", "Baseline Water", "Bear Creek W&S", 
+        "Beaver Brook Water & Sanitation", "Beebe Draw W&S", "Bennett Bear Cr. Farm W&S", "Berkeley W&S", "Blue Mountain Water", 
+        "Bone Mesa Domestic Water District", "Bonvue W&S", "Bow Mar W&S", "Box Elder W&S", "Bristol W&S", "Brook Forest Water", 
+        "Brookridge Heights W&S", "Brownsville W&S", "Byers W&S", "COLORADO CITY METRO WATER", "Capulin W&S", 
+        "Castle Pines Metropolitan", "Castle Pines North Metro", "Castleton Center W&S", "Castlewood Water & Sanitation District", 
+        "Centennial W&S", "Central Adams County W&S", "Central Weld County Water", "Charlou Park Water", "Chatfield South Water", 
+        "Cherry Creek Valley W&S", "Cherry Creek Village Water", "Cherry Hills Heights W&S", "Cherry Hills North W&S", 
+        "Cherry Hills Village", "Cherry Moor Water", "Cherrymoor South W&S", "Chipeta Water", "Clear Creek Valley W&S", 
+        "Clifton Water", "College Park W&S", "Colorado Dept. of Natural Resources", "Colorado Springs Utility", "Columbine Lake Water", 
+        "Columbine W&S", "Compark Business Campus Metro", "Concord Metropolitan", "Consolidated Bell Mountain Ranch Metro", 
+        "Consolidated Mutual Water Company", "Cottonwood W&S", "Country Homes Metro District", "Crestview W&S", "Crow Hill W&S", 
+        "Crowfoot Valley Ranch Metro #1", "Crowfoot Valley Ranch Metro #2", "Cucharas W&S", "Deep Creek W&S", "Denver Suburban Water", 
+        "Denver Water", "Devonshire Heights W&S", "Diamond Ridge Water and Sanitation District", "Dominion (Sterling Ranch)", 
+        "Donala W&S", "E-470 Potomac Metro", "Eagle River W&S", "East Alamosa W&S", "East Boulder County Water District", 
+        "East Cherry Creek Valley Water and Sanitation", "East Dillon Water", "East Eaton W&S", "East Larimer County Water", 
+        "East Valley W&S", "Eastlake W&S", "Elbert Creek W&S", "Elbert W&S", "Florissant W&S", "Forest View Acres Water District", 
+        "Fort Collins - Loveland Water", "Fruitvale W&S", "Galeton W&S", "Galleria Metro Distric", "Garden Valley W&S", 
+        "Gardner W&S", "Genesee W&S", "Goodman Point Water District", "Grand County W&S No. 1", "Grant W&S", "Greatrock North W&S", 
+        "Green Mountain W&S", "Green Valley W&S", "Greenwood Plaza Water", "Harris Park W&S", "Havana W&S", "Hazeltine Heights W&S", 
+        "Heeney Water District", "Hi-Land Acres W&S", "Hi-Lin W&S", "Hidden Pointe Metropolitan", "High View Water", 
+        "Highland Lakes Water", "Highlands Ranch Metro", "Hillcrest W&S", "Himalaya W&S", "Holly Hills W&S", "Hoover Hill W&S", 
+        "Idledale W&S", "Indian Hills Water", "Industrial Park W&S", "Inverness W&S", "Ken-Caryl Ranch W&S", "Ken-Caryl West Ranch Water", 
+        "Kittredge W&S", "Knollwood Water", "LOCKHEED MARTIN SPACE SYSTEM CO.", "La Plata Archuleta Water District", "Lake Eldora W&S", 
+        "Lakehurst W&S", "Lakeview Estates Water District", "Laporte W&S", "Left Hand W&S", "Left Hand Water", "Leyden Water", 
+        "Lincoln Park Metropolitan", "Little Thompson Water", "Littleton", "Lochmoor W&S", "Longs Peak Water", "Lookout Mountain Water", 
+        "Louviers Mutual Service Company", "Mansfield Heights W&S", "Meadowbrook Water", "Menoken Water", "Meridian Metropolitan", 
+        "Meridian Village Metro 2", "Mesa Cortina Water & Sanitation District", "Mesa View Water", "Mesa W&S", "Miller Ranch Water & Sanitation District", 
+        "Montezuma County Water No. 1", "Morgan County Quality Water", "Morrison Creek Metro. W&S", "Mountain View Water and Sanitation District", 
+        "Mountain W&S", "Mt. Crested Butte W&S", "Mt. Werner W&S", "Munn'S Addition W&S", "N. Douglas County W&S", "Navajo Western Water", 
+        "North Carter Lake Water", "North Douglas County W&S", "North Lincoln W&S", "North Meridian Metro", "North Pecos W&S", "North Shore W&S", 
+        "North Table Mountain W&S", "North Washington St. W&S", "North Weld County Water", "Northgate Water", "Olde Stage Water", "PINE DR WATER", 
+        "PUEBLO BOARD OF WATER WORKS", "PUEBLO WEST METRO WATER DIST", "Pagosa Area W&S", "Park Center Water", "Park Forest Water", 
+        "Parker W&S", "Parkville Water", "Penrose Water", "Perry Park W&S", "Perry Park W&S and Town of Larkspur", "Pine Brook Water", 
+        "Pinery - Denver SE Suburban", "Pinewood Springs Water", "Pinon W&S", "Pioneer Lookout Water", "Platte Canyon W&S", "Pleasant View W&S", 
+        "Prairie View Ranch Water District", "RYE TOWN WATER", "Rainbow Valley Water", "Ralston Valley W&S", "Rangeview Water", "Ravenna Metro", 
+        "Red Rock Valley Estates Water", "Redstone W&S", "Remuda Ranch Metro", "Ridgewood Water", "Roaring Fork W&S", "Rock Creek Mesa Water", 
+        "Round Mountain W&S", "Roxborough Park Metro", "S. Sheridan Water and Sanitation", "S.W. Suburban Denver W&S", "San Luis W&S", 
+        "Security Water", "Sedalia W&S", "Shannon W&S", "Shaw Heights Water", "Silver Creek W&S", "Silver Heights W&S", "Snake River Water", 
+        "Snowmass W&S", "Soliltude Metro Dist", "Somerset Domestic Waterworks", "South Adams County W&S", "South Evergreen Water", 
+        "South Fork W&S", "South Meridian Metro", "South Meridian Metro Debt Service", "South Park Metro", "South Santa Fe Metro 1", 
+        "South Santa Fe Metro 2", "South University Place Water Association", "South-East Englewood Water", "Southeast Englewood Water District", 
+        "Southgate Water", "Southwest Cherry Hills Water", "Southwest Metro W&S", "Spring Canyon W&S", "St. Charles Mesa Water", "St. Mary'S Glacier W&S", 
+        "Starwood Water", "Steamboat Lake W&S", "Stonegate Village Metro", "Strasburg W&S", "Stratmoor Hills Water", "Summit Ridge Water", 
+        "Sunset Water", "Sylvan Lakes W&S", "Tabernash Meadows W&S", "Teller County W&S 1", "Three Lakes W&S", "Thunderbird W&S", "Timber Creek Water District", 
+        "Timbers W&S", "Turkey Canon Ranch Water", "United Water and Sanitation District", "Upper Bear Creek W&S", "Valley At Winter Park Water", 
+        "Valley Water", "Wah Keeney Park W&S", "West Del Norte W&S", "West Fort Collins Water", "West Loveland W&S", "Westcreek Lakes Water", 
+        "Westmoor W&S", "Westwood Lakes Water", "Wheat Ridge Water", "White Horse Springs W&S", "Widefield W&S", "Willowbrook W&S", "Willows Water", 
+        "Winter Park W&S", "Winter Park West W&S", "Woodmoor W&S No. 1"
+    ];
+
+    const colorMap = names.reduce((map, name, index) => {
+        map[name] = colors[index % colors.length];
+        return map;
+    }, {});
+
+    // Function to update GeoJSON data with color information
+    const updateColor = (data) => {
+        data.features.forEach(feature => {
+            const name = feature.properties.NAME;
+            feature.properties.color = colorMap[name] || '#000000'; // Default color if name not found
+        });
+        console.log('Updated data:', data); // Debug: log updated data
+        return data;
+    };
+
+    // Create the legend
+    const createLegend = () => {
+        const legend = document.getElementById('legend');
+        Object.keys(colorMap).forEach(name => {
+            const color = colorMap[name];
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+            item.innerHTML = `<span class="legend-key" style="background-color: ${color};"></span><span class="legend-value">${name}</span>`;
+            legend.appendChild(item);
+            item.querySelector('.legend-value').addEventListener('click', () => {
+                const feature = geojsonData.features.find(f => f.properties.NAME === name);
+                if (feature) {
+                    const coordinates = feature.geometry.coordinates[0][0];
+                    const bounds = coordinates.reduce((bounds, coord) => {
+                        return bounds.extend(coord);
+                    }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+                    map.fitBounds(bounds, {
+                        padding: 20
+                    });
+                }
+            });
+        });
+    };
+
+    // Add popup on click
+    map.on('click', 'water_districts_all', (e) => {
+        const name = e.features[0].properties.NAME;
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(`<strong>${name}</strong>`)
+            .addTo(map);
+    });
+
+    // Change the cursor to a pointer when the mouse is over the water_districts_all layer.
+    map.on('mouseenter', 'water_districts_all', () => {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+
+    // Change it back to a pointer when it leaves.
+    map.on('mouseleave', 'water_districts_all', () => {
+        map.getCanvas().style.cursor = '';
+    });
+</script>
+
+</body>
+</html>
