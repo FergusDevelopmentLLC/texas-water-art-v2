@@ -65,7 +65,7 @@
 
     map.on('load', () => {
         // Load GeoJSON file
-        fetch('/data/water_districts_all.geojson')
+        fetch('data/water_districts_all.geojson')
             .then(response => response.json())
             .then(data => {
                 geojsonData = data;
